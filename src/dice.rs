@@ -10,11 +10,11 @@ pub enum Glitch {
 
 #[derive(Debug)]
 pub struct RollResult {
-	dice: Vec<u8>,
-	reroll_dice: Vec<u8>,
-	hits: usize,
-	glitch: Glitch,
-	roll_type: RollType
+	pub dice: Vec<u8>,
+	pub reroll_dice: Vec<u8>,
+	pub hits: usize,
+	pub glitch: Glitch,
+	pub roll_type: RollType
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Copy)]

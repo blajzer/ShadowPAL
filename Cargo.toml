@@ -8,3 +8,8 @@ edition = "2018"
 
 [dependencies]
 rand = "0.7.0"
+gio = "0.7.0"
+
+[dependencies.gtk]
+version = "0.7.0"
+features = ["v3_16"]
