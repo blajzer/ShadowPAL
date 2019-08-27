@@ -9,7 +9,12 @@ edition = "2018"
 [dependencies]
 rand = "0.7.0"
 gio = "0.7.0"
+ron = "0.5.1"
 
 [dependencies.gtk]
 version = "0.7.0"
 features = ["v3_16"]
+
+[dependencies.serde]
+version = "1.0.99"
+features = ["rc"]

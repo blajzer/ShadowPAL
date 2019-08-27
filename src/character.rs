@@ -1,4 +1,7 @@
-#[derive(Debug)]
+extern crate serde;
+use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Metatype {
 	Human,
 	Elf,
@@ -21,7 +24,7 @@ impl std::fmt::Display for Metatype {
     }
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Archetype {
 	Adept,
 	Decker,
@@ -50,7 +53,7 @@ impl std::fmt::Display for Archetype {
     }
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Character {
 	pub body: u8,
 	pub agility: u8,
@@ -63,26 +66,34 @@ pub struct Character {
 	pub edge: u8,
 	pub magic_or_resonance: u8,
 	pub essence: f32,
+	pub physical_damage: u8,
+	pub stun_damage: u8,
 	pub name: String,
 	pub metatype: Metatype,
 	pub archetype: Archetype
 }
 
 impl Character {
-	pub fn mental_limit(&self) -> u8 {
+	pub fn mental_limit(&self) -> usize {
 		let inner = (self.logic * 2 + self.intuition + self.will) as f32;
-		(inner / 3.0 + 0.5).floor() as u8
+		(inner / 3.0 + 0.5).floor() as usize
 	}
 
-	pub fn physical_limit(&self) -> u8 {
+	pub fn physical_limit(&self) -> usize {
 		let inner = (self.strength * 2 + self.body + self.reaction) as f32;
-		(inner / 3.0 + 0.5).floor() as u8
+		(inner / 3.0 + 0.5).floor() as usize
 	}
 
-	pub fn social_limit(&self) -> u8 {
+	pub fn social_limit(&self) -> usize {
 		let inner = (self.charisma * 2 + self.will) as f32 + self.essence;
-		(inner / 3.0 + 0.5).floor() as u8
+		(inner / 3.0 + 0.5).floor() as usize
 	}
 
-	
+	pub fn physical_damage_max(&self) -> usize {
+		(self.body as usize) / 2 + 8
+	}
+
+	pub fn stun_damage_max(&self) -> usize {
+		(self.will as usize) / 2 + 8
+	}
 }

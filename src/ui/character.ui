@@ -8,6 +8,7 @@
     <property name="can_focus">False</property>
     <property name="halign">center</property>
     <property name="valign">center</property>
+    <property name="margin_bottom">5</property>
     <property name="label_xalign">0</property>
     <property name="shadow_type">in</property>
     <child>
@@ -19,14 +20,95 @@
         <property name="orientation">vertical</property>
         <property name="spacing">2</property>
         <child>
-          <object class="GtkLabel" id="NameArchetypeLabel">
+          <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">5</property>
-            <property name="margin_right">5</property>
-            <property name="label" translatable="yes">&lt;span font_weight="heavy" size="18432"&gt;Name&lt;/span&gt;&lt;span size="18432"&gt; - &lt;/span&gt;&lt;span size="16384" font_style="italic"&gt;Archetype&lt;/span&gt;</property>
-            <property name="use_markup">True</property>
-            <property name="xalign">0.019999999552965164</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkLabel" id="NameLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_right">5</property>
+                    <property name="label" translatable="yes">&lt;span font_weight="heavy" size="18432"&gt;Name&lt;/span&gt;&lt;span size="18432"&gt;&lt;/span&gt;</property>
+                    <property name="use_markup">True</property>
+                    <property name="xalign">0.019999999552965164</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="ArchetypeLabel">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">&lt;span size="16384" font_style="italic"&gt;Archetype&lt;/span&gt;</property>
+                    <property name="use_markup">True</property>
+                    <property name="xalign">0.05000000074505806</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="DeleteNPC">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="halign">center</property>
+                <property name="valign">start</property>
+                <property name="margin_right">5</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="stock">gtk-delete</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="SelectNPC">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="focus_on_click">False</property>
+                <property name="receives_default">True</property>
+                <property name="halign">center</property>
+                <property name="valign">start</property>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="stock">gtk-go-forward</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -198,7 +280,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel">
+              <object class="GtkLabel" id="MagOrRes">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_left">5</property>
@@ -345,6 +427,8 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
             <property name="spacing">4</property>
             <child>
               <object class="GtkBox">
@@ -358,6 +442,7 @@
                     <property name="margin_left">5</property>
                     <property name="margin_right">5</property>
                     <property name="label" translatable="yes">Physical</property>
+                    <property name="justify">center</property>
                     <attributes>
                       <attribute name="font-desc" value="Sans Bold 10"/>
                     </attributes>
@@ -369,13 +454,16 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkGrid">
+                  <object class="GtkGrid" id="PhysicalGrid">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="halign">center</property>
                     <property name="margin_left">5</property>
                     <property name="margin_right">5</property>
                     <property name="row_spacing">2</property>
                     <property name="column_spacing">2</property>
+                    <property name="row_homogeneous">True</property>
+                    <property name="column_homogeneous">True</property>
                     <child>
                       <object class="GtkCheckButton">
                         <property name="visible">True</property>
@@ -599,6 +687,51 @@
                       <packing>
                         <property name="left_attach">2</property>
                         <property name="top_attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left_attach">1</property>
+                        <property name="top_attach">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="draw_indicator">True</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left_attach">2</property>
+                        <property name="top_attach">5</property>
                       </packing>
                     </child>
                   </object>
@@ -627,6 +760,7 @@
                     <property name="margin_left">5</property>
                     <property name="margin_right">5</property>
                     <property name="label" translatable="yes">Stun</property>
+                    <property name="justify">center</property>
                     <attributes>
                       <attribute name="font-desc" value="Sans Bold 10"/>
                     </attributes>
@@ -638,9 +772,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkGrid">
+                  <object class="GtkGrid" id="StunGrid">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="halign">center</property>
                     <property name="margin_left">5</property>
                     <property name="margin_right">5</property>
                     <property name="row_spacing">2</property>
@@ -885,7 +1020,231 @@
               </packing>
             </child>
             <child>
-              <placeholder/>
+              <object class="GtkGrid">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="halign">end</property>
+                <property name="valign">start</property>
+                <property name="hexpand">True</property>
+                <child>
+                  <object class="GtkLabel" id="PhysicalLimit">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="margin_right">5</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Physical: &lt;/b&gt;5</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="MentalLimit">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="margin_right">5</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Mental: &lt;/b&gt;5</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="SocialLimit">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="margin_right">5</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Social: &lt;/b&gt;5</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="Initiative">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_right">5</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Initiative:&lt;/b&gt; 10</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="MatrixInitiative">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_right">5</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Matrix Init:&lt;/b&gt; 5</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="AstralInitiative">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">start</property>
+                    <property name="margin_left">5</property>
+                    <property name="margin_right">5</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Astral Init:&lt;/b&gt; 16</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEventBox" id="RollInitiative">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_left">2</property>
+                        <property name="margin_right">2</property>
+                        <property name="margin_top">2</property>
+                        <property name="margin_bottom">2</property>
+                        <property name="stock">gtk-media-play</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEventBox" id="RollMatrixInitiative">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_left">2</property>
+                        <property name="margin_right">2</property>
+                        <property name="margin_top">2</property>
+                        <property name="margin_bottom">2</property>
+                        <property name="stock">gtk-media-play</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEventBox" id="RollAstralInitiative">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_left">2</property>
+                        <property name="margin_right">2</property>
+                        <property name="margin_top">2</property>
+                        <property name="margin_bottom">2</property>
+                        <property name="stock">gtk-media-play</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEventBox" id="AdvanceInitiative">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_left">2</property>
+                        <property name="margin_right">2</property>
+                        <property name="margin_top">2</property>
+                        <property name="margin_bottom">2</property>
+                        <property name="stock">gtk-media-next</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="left_attach">3</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEventBox" id="AdvanceMatrixInitiative">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_left">2</property>
+                        <property name="margin_right">2</property>
+                        <property name="margin_top">2</property>
+                        <property name="margin_bottom">2</property>
+                        <property name="stock">gtk-media-next</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="left_attach">3</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEventBox" id="AdvanceAstralInitiative">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <child>
+                      <object class="GtkImage">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_left">2</property>
+                        <property name="margin_right">2</property>
+                        <property name="margin_top">2</property>
+                        <property name="margin_bottom">2</property>
+                        <property name="stock">gtk-media-next</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="left_attach">3</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
             </child>
           </object>
           <packing>
