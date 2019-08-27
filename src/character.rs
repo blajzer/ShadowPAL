@@ -68,6 +68,9 @@ pub struct Character {
 	pub essence: f32,
 	pub physical_damage: u8,
 	pub stun_damage: u8,
+	pub initiative: u8,
+	pub matrix_initiative: u8,
+	pub astral_initiative: u8,
 	pub name: String,
 	pub metatype: Metatype,
 	pub archetype: Archetype

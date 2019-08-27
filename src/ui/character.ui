@@ -1075,7 +1075,7 @@
                     <property name="halign">start</property>
                     <property name="margin_left">5</property>
                     <property name="margin_right">5</property>
-                    <property name="label" translatable="yes">&lt;b&gt;Initiative:&lt;/b&gt; 10</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Initiative:&lt;/b&gt; 0</property>
                     <property name="use_markup">True</property>
                   </object>
                   <packing>
@@ -1090,7 +1090,7 @@
                     <property name="halign">start</property>
                     <property name="margin_left">5</property>
                     <property name="margin_right">5</property>
-                    <property name="label" translatable="yes">&lt;b&gt;Matrix Init:&lt;/b&gt; 5</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Matrix Init:&lt;/b&gt; 0</property>
                     <property name="use_markup">True</property>
                   </object>
                   <packing>
@@ -1105,7 +1105,7 @@
                     <property name="halign">start</property>
                     <property name="margin_left">5</property>
                     <property name="margin_right">5</property>
-                    <property name="label" translatable="yes">&lt;b&gt;Astral Init:&lt;/b&gt; 16</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Astral Init:&lt;/b&gt; 0</property>
                     <property name="use_markup">True</property>
                   </object>
                   <packing>

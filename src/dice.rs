@@ -92,3 +92,10 @@ pub fn roll(dice_count: usize, roll_type: RollType) -> RollResult {
 		roll_type: roll_type
 	}
 }
+
+pub fn basic_roll(dice_count: usize) -> usize {
+	let mut rng = rand::thread_rng();
+	let die = Uniform::new_inclusive(1, 6);
+
+	(0..dice_count).map(|_| { die.sample(&mut rng) }).sum()
+}

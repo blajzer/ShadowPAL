@@ -2,20 +2,19 @@
 //#![windows_subsystem = "windows"]
 
 extern crate gtk;
+use gtk::prelude::*;
+use gtk::{ApplicationWindow, Builder};
+
 extern crate gio;
+use gio::prelude::*;
+
 extern crate ron;
 extern crate serde;
-
 use serde::{Deserialize, Serialize};
-
-use gio::prelude::*;
-use gtk::prelude::*;
 
 use std::fs;
 use std::rc::Rc;
 use std::cell::RefCell;
-
-use gtk::{ApplicationWindow, Builder};
 
 use std::env::args;
 
@@ -191,6 +190,129 @@ fn make_character_widget(char_data: Rc<RefCell<character::Character>>) -> gtk::B
 		}
 	}
 
+	// Limits
+	let physical_limit: gtk::Label = builder.get_object("PhysicalLimit").expect("Couldn't get PhysicalLimit");
+	let physical_limit_text = format!("<b>Physical: </b>{}", char_data_ref.physical_limit());
+	physical_limit.set_markup(physical_limit_text.as_str());
+
+	let mental_limit: gtk::Label = builder.get_object("MentalLimit").expect("Couldn't get MentalLimit");
+	let mental_limit_text = format!("<b>Mental: </b>{}", char_data_ref.mental_limit());
+	mental_limit.set_markup(mental_limit_text.as_str());
+
+	let social_limit: gtk::Label = builder.get_object("SocialLimit").expect("Couldn't get SocialLimit");
+	let social_limit_text = format!("<b>Social: </b>{}", char_data_ref.social_limit());
+	social_limit.set_markup(social_limit_text.as_str());
+
+	// Initiative
+	// TODO: dedup
+	{
+		let data_ref = char_data.clone();
+		let initiative: gtk::Label = builder.get_object("Initiative").expect("Couldn't get Initiative");
+		let initiative_copy = initiative.clone();
+		let roll_initiative: gtk::EventBox = builder.get_object("RollInitiative").expect("Couldn't get RollInitiative");
+		roll_initiative.connect_button_release_event(move |_, event| {
+			if event.get_button() == 1 {
+				let mut mut_char = data_ref.borrow_mut();
+				mut_char.initiative = mut_char.reaction + mut_char.intuition + dice::basic_roll(1) as u8;
+
+				let init_text = format!("<b>Initiative: </b>{}", mut_char.initiative);
+				initiative.set_markup(init_text.as_str());
+
+				gtk::Inhibit(false)
+			} else {
+				gtk::Inhibit(true)
+			}
+		});
+
+		let data_ref = char_data.clone();
+		let advance_initiative: gtk::EventBox = builder.get_object("AdvanceInitiative").expect("Couldn't get AdvanceInitiative");
+		advance_initiative.connect_button_release_event(move |_, event| {
+			if event.get_button() == 1 {
+				let mut mut_char = data_ref.borrow_mut();
+				mut_char.initiative = if mut_char.initiative >= 10 { mut_char.initiative - 10 } else { 0 };
+
+				let init_text = format!("<b>Initiative: </b>{}", mut_char.initiative);
+				initiative_copy.set_markup(init_text.as_str());
+
+				gtk::Inhibit(false)
+			} else {
+				gtk::Inhibit(true)
+			}
+		});
+	}
+
+	{
+		let data_ref = char_data.clone();
+		let initiative: gtk::Label = builder.get_object("MatrixInitiative").expect("Couldn't get MatrixInitiative");
+		let initiative_copy = initiative.clone();
+		let roll_initiative: gtk::EventBox = builder.get_object("RollMatrixInitiative").expect("Couldn't get RollMatrixInitiative");
+		roll_initiative.connect_button_release_event(move |_, event| {
+			if event.get_button() == 1 {
+				let mut mut_char = data_ref.borrow_mut();
+				mut_char.matrix_initiative = mut_char.reaction + mut_char.intuition + dice::basic_roll(1) as u8;
+
+				let init_text = format!("<b>Matrix Init: </b>{}", mut_char.matrix_initiative);
+				initiative.set_markup(init_text.as_str());
+
+				gtk::Inhibit(false)
+			} else {
+				gtk::Inhibit(true)
+			}
+		});
+
+		let data_ref = char_data.clone();
+		let advance_initiative: gtk::EventBox = builder.get_object("AdvanceMatrixInitiative").expect("Couldn't get AdvanceMatrixInitiative");
+		advance_initiative.connect_button_release_event(move |_, event| {
+			if event.get_button() == 1 {
+				let mut mut_char = data_ref.borrow_mut();
+				mut_char.matrix_initiative = if mut_char.matrix_initiative >= 10 { mut_char.matrix_initiative - 10 } else { 0 };
+
+				let init_text = format!("<b>Matrix Init: </b>{}", mut_char.matrix_initiative);
+				initiative_copy.set_markup(init_text.as_str());
+
+				gtk::Inhibit(false)
+			} else {
+				gtk::Inhibit(true)
+			}
+		});
+	}
+
+	{
+		let data_ref = char_data.clone();
+		let initiative: gtk::Label = builder.get_object("AstralInitiative").expect("Couldn't get AstralInitiative");
+		let initiative_copy = initiative.clone();
+		let roll_initiative: gtk::EventBox = builder.get_object("RollAstralInitiative").expect("Couldn't get RollAstralInitiative");
+		roll_initiative.connect_button_release_event(move |_, event| {
+			if event.get_button() == 1 {
+				let mut mut_char = data_ref.borrow_mut();
+				mut_char.astral_initiative = mut_char.intuition + mut_char.intuition + dice::basic_roll(2) as u8;
+
+				let init_text = format!("<b>Astral Init: </b>{}", mut_char.astral_initiative);
+				initiative.set_markup(init_text.as_str());
+
+				gtk::Inhibit(false)
+			} else {
+				gtk::Inhibit(true)
+			}
+		});
+
+		let data_ref = char_data.clone();
+		let advance_initiative: gtk::EventBox = builder.get_object("AdvanceAstralInitiative").expect("Couldn't get AdvanceAstralInitiative");
+		advance_initiative.connect_button_release_event(move |_, event| {
+			if event.get_button() == 1 {
+				let mut mut_char = data_ref.borrow_mut();
+				mut_char.astral_initiative = if mut_char.astral_initiative >= 10 { mut_char.astral_initiative - 10 } else { 0 };
+
+				let init_text = format!("<b>Astral Init: </b>{}", mut_char.astral_initiative);
+				initiative_copy.set_markup(init_text.as_str());
+
+				gtk::Inhibit(false)
+			} else {
+				gtk::Inhibit(true)
+			}
+		});
+	}
+
 	builder
 }
 
@@ -303,6 +425,9 @@ fn main() {
 			essence: 6.0,
 			physical_damage: 0,
 			stun_damage: 0,
+			initiative: 0,
+			matrix_initiative: 0,
+			astral_initiative: 0,
 			name: "Beefy Guard".to_string(),
 			metatype: character::Metatype::Troll,
 			archetype: character::Archetype::StreetSamurai
