@@ -246,10 +246,21 @@ fn make_character_widget(char_data: Rc<RefCell<character::Character>>) -> gtk::B
 		let initiative: gtk::Label = builder.get_object("MatrixInitiative").expect("Couldn't get MatrixInitiative");
 		let initiative_copy = initiative.clone();
 		let roll_initiative: gtk::EventBox = builder.get_object("RollMatrixInitiative").expect("Couldn't get RollMatrixInitiative");
+		let init_type: gtk::ComboBoxText = builder.get_object("MatrixInitType").expect("Couldn't get MatrixInitType");
 		roll_initiative.connect_button_release_event(move |_, event| {
 			if event.get_button() == 1 {
 				let mut mut_char = data_ref.borrow_mut();
-				mut_char.matrix_initiative = mut_char.reaction + mut_char.intuition + dice::basic_roll(1) as u8;
+
+				mut_char.matrix_initiative = if let Some(s) = init_type.get_active_text() {
+					match s.as_str() {
+						"AR" => mut_char.reaction + mut_char.intuition + dice::basic_roll(1) as u8,
+						"VR (Cold)" => mut_char.intuition + dice::basic_roll(3) as u8,
+						"VR (Hot)" => mut_char.intuition + dice::basic_roll(4) as u8,
+						_ => mut_char.reaction + mut_char.intuition + dice::basic_roll(1) as u8
+					}
+				} else {
+					mut_char.reaction + mut_char.intuition + dice::basic_roll(1) as u8
+				};
 
 				let init_text = format!("<b>Matrix Init: </b>{}", mut_char.matrix_initiative);
 				initiative.set_markup(init_text.as_str());
