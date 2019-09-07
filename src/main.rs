@@ -571,6 +571,7 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 		let tedg_clone = tedg.clone();
 		let tmag_clone = tmag.clone();
 		let tess_clone = tess.clone();
+		let window_clone = window.clone();
 		template_save.connect_clicked(move |_| {
 			let mut mut_gds = gds_clone.borrow_mut();
 
@@ -590,9 +591,27 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 				&tmag_clone,
 				&tess_clone);
 
-			mut_gds.template_characters.push(character);
-			rebuild_template_list(&template_list_clone, &mut_gds.template_characters);
-			template_list_clone.set_active_id(Some((mut_gds.template_characters.len() - 1).to_string().as_str()));
+			if let Some(pos) = mut_gds.template_characters.iter().position(|c| c.name == character.name) {
+				let dialog = gtk::Dialog::new_with_buttons(
+						Some("Replace Existing Template?"),
+						Some(&window_clone),
+						gtk::DialogFlags::MODAL,
+						&[("Don't Save", gtk::ResponseType::Reject),
+						("Replace Existing", gtk::ResponseType::Accept)]);
+					
+					match dialog.run() {
+						gtk::ResponseType::Accept => {
+							mut_gds.template_characters[pos] = character;
+						},
+						_ => ()
+					}
+
+					dialog.destroy();
+			} else {
+				mut_gds.template_characters.push(character);
+				rebuild_template_list(&template_list_clone, &mut_gds.template_characters);
+				template_list_clone.set_active_id(Some((mut_gds.template_characters.len() - 1).to_string().as_str()));
+			}
 		});
 
 
