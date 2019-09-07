@@ -1,6 +1,8 @@
 extern crate serde;
 use serde::{Deserialize, Serialize};
 
+use std::str::FromStr;
+
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Metatype {
 	Human,
@@ -21,6 +23,24 @@ impl std::fmt::Display for Metatype {
 				Metatype::Troll => "Troll"
 			}
 		)
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ParseMetatypeError { }
+
+impl FromStr for Metatype {
+    type Err = ParseMetatypeError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+			"human" => Ok(Metatype::Human),
+			"elf" => Ok(Metatype::Elf),
+			"dwarf" => Ok(Metatype::Dwarf),
+			"ork" => Ok(Metatype::Ork),
+			"troll" => Ok(Metatype::Troll),
+			_ => Err(Self::Err{})
+		}
     }
 }
 
@@ -50,6 +70,27 @@ impl std::fmt::Display for Archetype {
 				Archetype::Technomancer => "Technomancer"
 			}
 		)
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ParseArchetypeError { }
+
+impl FromStr for Archetype {
+    type Err = ParseMetatypeError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+			"adept" => Ok(Archetype::Adept),
+			"decker" => Ok(Archetype::Decker),
+			"face" => Ok(Archetype::Face),
+			"mage" => Ok(Archetype::Mage),
+			"rigger" => Ok(Archetype::Rigger),
+			"shaman" => Ok(Archetype::Shaman),
+			"street samurai" => Ok(Archetype::StreetSamurai),
+			"technomancer" => Ok(Archetype::Technomancer),
+			_ => Err(Self::Err{})
+		}
     }
 }
 

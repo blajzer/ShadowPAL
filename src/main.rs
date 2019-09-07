@@ -327,6 +327,118 @@ fn make_character_widget(char_data: Rc<RefCell<character::Character>>) -> gtk::B
 	builder
 }
 
+fn rebuild_template_list(template_list: &gtk::ComboBoxText, templates: &Vec<character::Character>) {
+	template_list.remove_all();
+
+	let mut char_index = 0;
+	for character in templates.iter() {
+		template_list.append(Some(char_index.to_string().as_str()), character.name.as_str());
+		
+		char_index += 1;
+	}
+}
+
+fn gtk_entry_to_num<T: std::str::FromStr>(entry: &gtk::Entry, default: T) -> T {
+	if let Some(value_str) = entry.get_text() {
+		if let Ok(value) = value_str.parse::<T>() {
+			value
+		} else {
+			default
+		}
+	} else {
+		default
+	}
+}
+
+fn make_character_from_template(
+	name: &gtk::Entry,
+	metatype: &gtk::ComboBoxText,
+	archetype: &gtk::ComboBoxText,
+	body: &gtk::Entry,
+	agility: &gtk::Entry,
+	reaction: &gtk::Entry,
+	strength: &gtk::Entry,
+	will: &gtk::Entry,
+	logic: &gtk::Entry,
+	intuition: &gtk::Entry,
+	charisma: &gtk::Entry,
+	edge: &gtk::Entry,
+	magic: &gtk::Entry,
+	essence: &gtk::Entry
+) -> character::Character {
+	let name_string = if let Some(name_text) = name.get_text() {
+		name_text.as_str().to_string()
+	} else {
+		"Unnamed Character".to_string()
+	};
+
+	character::Character {
+		body: gtk_entry_to_num(&body, 0),
+		agility: gtk_entry_to_num(&agility, 0),
+		reaction: gtk_entry_to_num(&reaction, 0),
+		strength: gtk_entry_to_num(&strength, 0),
+		will: gtk_entry_to_num(&will, 0),
+		logic: gtk_entry_to_num(&logic, 0),
+		intuition: gtk_entry_to_num(&intuition, 0),
+		charisma: gtk_entry_to_num(&charisma, 0),
+		edge: gtk_entry_to_num(&edge, 0),
+		magic_or_resonance: gtk_entry_to_num(&magic, 0),
+		essence: gtk_entry_to_num(&essence, 6.0),
+		physical_damage: 0,
+		stun_damage: 0,
+		initiative: 0,
+		matrix_initiative: 0,
+		astral_initiative: 0,
+		name: name_string,
+		metatype: if let Some(metatype_str) = metatype.get_active_text() {
+			if let Ok(meta) = metatype_str.parse() {
+				meta
+			} else {
+				character::Metatype::Human
+			}
+		} else {
+			character::Metatype::Human
+		},
+		archetype: if let Some(archetype_str) = archetype.get_active_text() {
+			if let Ok(arch) = archetype_str.parse() {
+				arch
+			} else {
+				character::Archetype::Adept
+			}
+		} else {
+			character::Archetype::Adept
+		}
+	}
+}
+
+fn add_character_to_ui(
+	character: &Rc<RefCell<character::Character>>,
+	gds: &Rc<RefCell<DataStore>>,
+	npc_list: &gtk::Box
+) {
+	let npc = make_character_widget(character.clone());
+	let npc_root: gtk::Frame = npc.get_object("root").expect("Couldn't get root");
+
+	// Connect "delete" button
+	let delete_npc: gtk::Button = npc.get_object("DeleteNPC").expect("Couldn't get DeleteNPC");
+
+	let char_clone = character.clone();
+	let gds_clone = gds.clone();
+	let npc_root_copy = npc_root.clone();
+	let npc_list_copy = npc_list.clone();
+
+	delete_npc.connect_clicked(move |_| {
+		let mut mut_gds = gds_clone.borrow_mut();
+
+		if let Some(position) = mut_gds.active_characters.iter().position(|c| Rc::ptr_eq(c, &char_clone)) {
+			mut_gds.active_characters.remove(position);
+			npc_list_copy.remove(&npc_root_copy);
+		}
+	});
+
+	npc_list.add(&npc_root);
+}
+
 fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 	let glade_src = include_str!("ui/main.ui");
 
@@ -334,69 +446,194 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 	let window: ApplicationWindow = builder.get_object("MainWindow").expect("Couldn't get MainWindow");
 	window.set_application(Some(application));
 
-	let roll_dice_button: gtk::Button = builder.get_object("RollDice").expect("Couldn't get RollDice");
-	let roll_dice_count: gtk::SpinButton = builder.get_object("DiceCount").expect("Couldn't get DiceCount");
-	let roll_type: gtk::ComboBoxText = builder.get_object("RollType").expect("Couldn't get RollType");
-	let dice_output: gtk::TextBuffer = builder.get_object("DiceOutput").expect("Couldn't get DiceOutput");
-	let hit_label: gtk::Label = builder.get_object("HitLabel").expect("Couldn't get HitLabel");
-	let glitch_label: gtk::Label = builder.get_object("GlitchLabel").expect("Couldn't get GlitchLabel");
+	// Dice rolling section
+	{
+		let roll_dice_button: gtk::Button = builder.get_object("RollDice").expect("Couldn't get RollDice");
+		let roll_dice_count: gtk::SpinButton = builder.get_object("DiceCount").expect("Couldn't get DiceCount");
+		let roll_type: gtk::ComboBoxText = builder.get_object("RollType").expect("Couldn't get RollType");
+		let dice_output: gtk::TextBuffer = builder.get_object("DiceOutput").expect("Couldn't get DiceOutput");
+		let hit_label: gtk::Label = builder.get_object("HitLabel").expect("Couldn't get HitLabel");
+		let glitch_label: gtk::Label = builder.get_object("GlitchLabel").expect("Couldn't get GlitchLabel");
 
-	roll_dice_button.connect_clicked(move |_| {
-		let dice_count = roll_dice_count.get_value_as_int() as usize;
-		let roll_type_enum = if let Some(s) = roll_type.get_active_text() {
-			match s.as_str() {
-				"Standard" => dice::RollType::Standard,
-				"Push The Limit" => dice::RollType::ReRollSixes,
-				"Second Chance" => dice::RollType::ReRollMisses,
-				_ => dice::RollType::Standard
-			}
-		} else {
-			dice::RollType::Standard
-		};
+		roll_dice_button.connect_clicked(move |_| {
+			let dice_count = roll_dice_count.get_value_as_int() as usize;
+			let roll_type_enum = if let Some(s) = roll_type.get_active_text() {
+				match s.as_str() {
+					"Standard" => dice::RollType::Standard,
+					"Push The Limit" => dice::RollType::ReRollSixes,
+					"Second Chance" => dice::RollType::ReRollMisses,
+					_ => dice::RollType::Standard
+				}
+			} else {
+				dice::RollType::Standard
+			};
 
-		let roll_result = dice::roll(dice_count, roll_type_enum);
+			let roll_result = dice::roll(dice_count, roll_type_enum);
 
-		// Set hits
-		let mut new_hit_text = "<b>Hits:</b> ".to_string();
-		new_hit_text.push_str(roll_result.hits.to_string().as_str());
-		hit_label.set_markup(new_hit_text.as_str());
+			// Set hits
+			let mut new_hit_text = "<b>Hits:</b> ".to_string();
+			new_hit_text.push_str(roll_result.hits.to_string().as_str());
+			hit_label.set_markup(new_hit_text.as_str());
 
-		// Set glitch
-		let mut new_glitch_text = "<b>Glitch:</b> ".to_string();
-		new_glitch_text.push_str(
-			match roll_result.glitch {
-				dice::Glitch::None => "No",
-				dice::Glitch::Glitch => "Yes",
-				dice::Glitch::CriticalGlitch => "Crit"
-			}	
-		);
-		glitch_label.set_markup(new_glitch_text.as_str());
+			// Set glitch
+			let mut new_glitch_text = "<b>Glitch:</b> ".to_string();
+			new_glitch_text.push_str(
+				match roll_result.glitch {
+					dice::Glitch::None => "No",
+					dice::Glitch::Glitch => "Yes",
+					dice::Glitch::CriticalGlitch => "Crit"
+				}	
+			);
+			glitch_label.set_markup(new_glitch_text.as_str());
 
-		// Roll results
-		let mut result_text = String::new();
-		for &d in roll_result.dice.iter() {
-			result_text.push_str(d.to_string().as_str());
-			result_text.push('\n');
-		}
-		
-		if roll_result.reroll_dice.len() > 0 {
-			result_text.push_str("\nRe-rolled dice:\n");
-			for &d in roll_result.reroll_dice.iter() {
+			// Roll results
+			let mut result_text = String::new();
+			for &d in roll_result.dice.iter() {
 				result_text.push_str(d.to_string().as_str());
 				result_text.push('\n');
 			}
-		}
+			
+			if roll_result.reroll_dice.len() > 0 {
+				result_text.push_str("\nRe-rolled dice:\n");
+				for &d in roll_result.reroll_dice.iter() {
+					result_text.push_str(d.to_string().as_str());
+					result_text.push('\n');
+				}
+			}
 
-		dice_output.set_text(result_text.as_str());
-	});
+			dice_output.set_text(result_text.as_str());
+		});
+	}
 
+	// Active NPC List
 	let npc_list: gtk::Box = builder.get_object("NPCList").expect("Couldn't get NPCList");
 	{
 		for character in gds.borrow().active_characters.iter() {
-			let npc = make_character_widget(character.clone());
-			let npc_root: gtk::Frame = npc.get_object("root").expect("Couldn't get root");
-			npc_list.add(&npc_root);
+			add_character_to_ui(character, &gds, &npc_list);
 		}
+	}
+
+	// NPC Templates
+	{
+		let template_instantiate: gtk::Button = builder.get_object("TemplateInstantiate").expect("Couldn't get TemplateInstantiate");
+		let template_save: gtk::Button = builder.get_object("TemplateSave").expect("Couldn't get TemplateSave");
+		let template_delete: gtk::Button = builder.get_object("TemplateDelete").expect("Couldn't get TemplateDelete");
+		let template_list: gtk::ComboBoxText = builder.get_object("TemplateList").expect("Couldn't get TemplateList");
+
+		let template_name: gtk::Entry = builder.get_object("TName").expect("Couldn't get TName");
+		let template_metatype: gtk::ComboBoxText = builder.get_object("TMetatype").expect("Couldn't get TMetatype");
+		let template_archetype: gtk::ComboBoxText = builder.get_object("TArchetype").expect("Couldn't get TArchetype");
+		let tbod: gtk::Entry = builder.get_object("TBOD").expect("Couldn't get TBOD");
+		let tagi: gtk::Entry = builder.get_object("TAGI").expect("Couldn't get TAGI");
+		let trea: gtk::Entry = builder.get_object("TREA").expect("Couldn't get TREA");
+		let tstr: gtk::Entry = builder.get_object("TSTR").expect("Couldn't get TSTR");
+		let twil: gtk::Entry = builder.get_object("TWIL").expect("Couldn't get TWIL");
+		let tlog: gtk::Entry = builder.get_object("TLOG").expect("Couldn't get TLOG");
+		let tint: gtk::Entry = builder.get_object("TINT").expect("Couldn't get TINT");
+		let tcha: gtk::Entry = builder.get_object("TCHA").expect("Couldn't get TCHA");
+		let tedg: gtk::Entry = builder.get_object("TEDG").expect("Couldn't get TEDG");
+		let tmag: gtk::Entry = builder.get_object("TMAG").expect("Couldn't get TMAG");
+		let tess: gtk::Entry = builder.get_object("TESS").expect("Couldn't get TESS");
+
+		// initialize the template list
+		rebuild_template_list(&template_list, &gds.borrow().template_characters);
+
+		// Delete button
+		let gds_clone = gds.clone();
+		let template_list_clone = template_list.clone();
+		template_delete.connect_clicked(move |_| {
+			if let Some(id_str) = template_list_clone.get_active_id() {
+				if let Ok(id) = id_str.as_str().parse::<i32>() {
+					if id >= 0 && id < (gds_clone.borrow().template_characters.len() as i32){
+						let mut mut_gds = gds_clone.borrow_mut();
+
+						mut_gds.template_characters.remove(id as usize);
+						rebuild_template_list(&template_list_clone, &mut_gds.template_characters);
+					}
+				}
+			}
+		});
+
+		// Save button
+		let gds_clone = gds.clone();
+		let template_list_clone = template_list.clone();
+		let template_name_clone = template_name.clone();
+		let template_metatype_clone = template_metatype.clone();
+		let template_archetype_clone = template_archetype.clone();
+		let tbod_clone = tbod.clone();
+		let tagi_clone = tagi.clone();
+		let trea_clone = trea.clone();
+		let tstr_clone = tstr.clone();
+		let twil_clone = twil.clone();
+		let tlog_clone = tlog.clone();
+		let tint_clone = tint.clone();
+		let tcha_clone = tcha.clone();
+		let tedg_clone = tedg.clone();
+		let tmag_clone = tmag.clone();
+		let tess_clone = tess.clone();
+		template_save.connect_clicked(move |_| {
+			let mut mut_gds = gds_clone.borrow_mut();
+
+			let character = make_character_from_template(
+				&template_name_clone,
+				&template_metatype_clone,
+				&template_archetype_clone,
+				&tbod_clone,
+				&tagi_clone,
+				&trea_clone,
+				&tstr_clone,
+				&twil_clone,
+				&tlog_clone,
+				&tint_clone,
+				&tcha_clone,
+				&tedg_clone,
+				&tmag_clone,
+				&tess_clone);
+
+			mut_gds.template_characters.push(character);
+			rebuild_template_list(&template_list_clone, &mut_gds.template_characters);
+			template_list_clone.set_active_id(Some((mut_gds.template_characters.len() - 1).to_string().as_str()));
+		});
+
+
+		// Instantiate button
+		let gds_clone = gds.clone();
+		let template_name_clone = template_name.clone();
+		let template_metatype_clone = template_metatype.clone();
+		let template_archetype_clone = template_archetype.clone();
+		let tbod_clone = tbod.clone();
+		let tagi_clone = tagi.clone();
+		let trea_clone = trea.clone();
+		let tstr_clone = tstr.clone();
+		let twil_clone = twil.clone();
+		let tlog_clone = tlog.clone();
+		let tint_clone = tint.clone();
+		let tcha_clone = tcha.clone();
+		let tedg_clone = tedg.clone();
+		let tmag_clone = tmag.clone();
+		let tess_clone = tess.clone();
+		template_instantiate.connect_clicked(move |_| {
+			let mut mut_gds = gds_clone.borrow_mut();
+
+			let character = Rc::new(RefCell::new(make_character_from_template(
+				&template_name_clone,
+				&template_metatype_clone,
+				&template_archetype_clone,
+				&tbod_clone,
+				&tagi_clone,
+				&trea_clone,
+				&tstr_clone,
+				&twil_clone,
+				&tlog_clone,
+				&tint_clone,
+				&tcha_clone,
+				&tedg_clone,
+				&tmag_clone,
+				&tess_clone)));
+
+			mut_gds.active_characters.push(character.clone());
+			add_character_to_ui(&character, &gds_clone, &npc_list);
+		});
 	}
 
 	window.show_all();

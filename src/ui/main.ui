@@ -37,6 +37,7 @@
               <object class="GtkFrame">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="halign">start</property>
                 <property name="margin_bottom">5</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">in</property>
@@ -54,13 +55,24 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <placeholder/>
+                          <object class="GtkComboBoxText" id="TemplateList">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="hexpand">True</property>
+                            <property name="active">0</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
                         </child>
                         <child>
                           <object class="GtkButton" id="TemplateInstantiate">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <property name="tooltip_text" translatable="yes">Instantiate</property>
                             <child>
                               <object class="GtkImage">
                                 <property name="visible">True</property>
@@ -76,29 +88,11 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="TemplateAdd">
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <child>
-                              <object class="GtkImage">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="stock">gtk-add</property>
-                              </object>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">2</property>
-                          </packing>
-                        </child>
-                        <child>
                           <object class="GtkButton" id="TemplateSave">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <property name="tooltip_text" translatable="yes">Save as current template</property>
                             <child>
                               <object class="GtkImage">
                                 <property name="visible">True</property>
@@ -118,6 +112,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">True</property>
+                            <property name="tooltip_text" translatable="yes">Delete current template</property>
                             <child>
                               <object class="GtkImage">
                                 <property name="visible">True</property>
@@ -158,6 +153,7 @@
                           <object class="GtkComboBoxText" id="TMetatype">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="tooltip_text" translatable="yes">Metatype</property>
                             <property name="active">0</property>
                             <items>
                               <item id="0" translatable="yes">Human</item>
@@ -177,6 +173,7 @@
                           <object class="GtkComboBoxText" id="TArchetype">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="tooltip_text" translatable="yes">Archetype</property>
                             <property name="active">0</property>
                             <property name="active_id">0</property>
                             <items>
@@ -498,6 +495,35 @@
                             <property name="top_attach">0</property>
                           </packing>
                         </child>
+                        <child>
+                          <object class="GtkEntry" id="TESS">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="max_length">4</property>
+                            <property name="width_chars">4</property>
+                            <property name="max_width_chars">2</property>
+                            <property name="text" translatable="yes">6.0</property>
+                            <property name="input_purpose">number</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">10</property>
+                            <property name="top_attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">ESS</property>
+                            <attributes>
+                              <attribute name="font-desc" value="Sans Bold 10"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="left_attach">10</property>
+                            <property name="top_attach">0</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -547,6 +573,7 @@
                           <object class="GtkBox" id="NPCList">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="valign">start</property>
                             <property name="margin_left">5</property>
                             <property name="margin_right">5</property>
                             <property name="margin_top">5</property>

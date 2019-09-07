@@ -70,6 +70,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">Delete</property>
                 <property name="halign">center</property>
                 <property name="valign">start</property>
                 <property name="margin_right">5</property>
@@ -93,6 +94,7 @@
                 <property name="can_focus">True</property>
                 <property name="focus_on_click">False</property>
                 <property name="receives_default">True</property>
+                <property name="tooltip_text" translatable="yes">Set as current</property>
                 <property name="halign">center</property>
                 <property name="valign">start</property>
                 <child>
