@@ -112,13 +112,13 @@ fn make_character_widget(char_data: Rc<RefCell<character::Character>>) -> gtk::B
 				mut_char.physical_damage = i as u8 + if c.get_active() { 1 } else { 0 };
 				
 				if let Some(parent_widget) = c.get_parent() {
-					if let Ok(parent) = gtk::Cast::dynamic_cast::<gtk::Grid>(parent_widget) {
+					if let Ok(parent) = parent_widget.dynamic_cast::<gtk::Grid>() {
 						for j in 0..mut_char.physical_damage_max() {
 							let row = (j / 3) as i32;
 							let col = (j % 3) as i32;
 
 							if let Some(check_widget) = parent.get_child_at(col, row) {
-								if let Ok(check) = gtk::Cast::dynamic_cast::<gtk::CheckButton>(check_widget) {
+								if let Ok(check) = check_widget.dynamic_cast::<gtk::CheckButton>() {
 									if j < i {
 										check.set_active(true);
 									} else if j > i {
@@ -135,6 +135,7 @@ fn make_character_widget(char_data: Rc<RefCell<character::Character>>) -> gtk::B
 			let cur_col = (i % 3) as i32;
 			damage_grid.attach(&checkbox, cur_col, cur_row, 1, 1);
 		}
+		damage_grid.show_all();
 	}
 
 	// Stun damage
@@ -165,13 +166,13 @@ fn make_character_widget(char_data: Rc<RefCell<character::Character>>) -> gtk::B
 				mut_char.stun_damage = i as u8 + if c.get_active() { 1 } else { 0 };
 
 				if let Some(parent_widget) = c.get_parent() {
-					if let Ok(parent) = gtk::Cast::dynamic_cast::<gtk::Grid>(parent_widget) {
+					if let Ok(parent) = parent_widget.dynamic_cast::<gtk::Grid>() {
 						for j in 0..mut_char.stun_damage_max() {
 							let row = (j / 3) as i32;
 							let col = (j % 3) as i32;
 
 							if let Some(check_widget) = parent.get_child_at(col, row) {
-								if let Ok(check) = gtk::Cast::dynamic_cast::<gtk::CheckButton>(check_widget) {
+								if let Ok(check) = check_widget.dynamic_cast::<gtk::CheckButton>() {
 									if j < i {
 										check.set_active(true);
 									} else if j > i {
@@ -188,6 +189,7 @@ fn make_character_widget(char_data: Rc<RefCell<character::Character>>) -> gtk::B
 			let cur_col = (i % 3) as i32;
 			damage_grid.attach(&checkbox, cur_col, cur_row, 1, 1);
 		}
+		damage_grid.show_all();
 	}
 
 	// Limits
