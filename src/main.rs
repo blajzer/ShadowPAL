@@ -540,13 +540,64 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 		// initialize the template list
 		rebuild_template_list(&template_list, &gds.borrow().template_characters);
 
+		// Template lists changed
+		let gds_clone = gds.clone();
+		let template_name_clone = template_name.clone();
+		let template_metatype_clone = template_metatype.clone();
+		let template_archetype_clone = template_archetype.clone();
+		let tbod_clone = tbod.clone();
+		let tagi_clone = tagi.clone();
+		let trea_clone = trea.clone();
+		let tstr_clone = tstr.clone();
+		let twil_clone = twil.clone();
+		let tlog_clone = tlog.clone();
+		let tint_clone = tint.clone();
+		let tcha_clone = tcha.clone();
+		let tedg_clone = tedg.clone();
+		let tmag_clone = tmag.clone();
+		let tess_clone = tess.clone();
+		template_list.connect_changed(move |list| {
+			// HACK: bail if this is being triggered programatically
+			if let Err(_) = gds_clone.try_borrow_mut() {
+				return;
+			}
+
+			if let Some(id_str) = list.get_active_id() {
+				if let Ok(id) = id_str.as_str().parse::<i32>() {
+					let gds = gds_clone.borrow();
+					if id >= 0 && id < (gds.template_characters.len() as i32) {
+						let template = &gds.template_characters[id as usize];
+						template_name_clone.set_text(template.name.as_str());
+
+						let metatype: i32 = template.metatype.into();
+						template_metatype_clone.set_active_id(Some(metatype.to_string().as_str()));
+
+						let archetype: i32 = template.archetype.into();
+						template_archetype_clone.set_active_id(Some(archetype.to_string().as_str()));
+
+						tbod_clone.set_text(template.body.to_string().as_str());
+						tagi_clone.set_text(template.agility.to_string().as_str());
+						trea_clone.set_text(template.reaction.to_string().as_str());
+						tstr_clone.set_text(template.strength.to_string().as_str());
+						twil_clone.set_text(template.will.to_string().as_str());
+						tlog_clone.set_text(template.logic.to_string().as_str());
+						tint_clone.set_text(template.intuition.to_string().as_str());
+						tcha_clone.set_text(template.charisma.to_string().as_str());
+						tedg_clone.set_text(template.edge.to_string().as_str());
+						tmag_clone.set_text(template.magic_or_resonance.to_string().as_str());
+						tess_clone.set_text(template.essence.to_string().as_str());
+					}
+				}
+			}
+		});
+
 		// Delete button
 		let gds_clone = gds.clone();
 		let template_list_clone = template_list.clone();
 		template_delete.connect_clicked(move |_| {
 			if let Some(id_str) = template_list_clone.get_active_id() {
 				if let Ok(id) = id_str.as_str().parse::<i32>() {
-					if id >= 0 && id < (gds_clone.borrow().template_characters.len() as i32){
+					if id >= 0 && id < (gds_clone.borrow().template_characters.len() as i32) {
 						let mut mut_gds = gds_clone.borrow_mut();
 
 						mut_gds.template_characters.remove(id as usize);
@@ -677,32 +728,6 @@ fn main() {
 			template_characters: Vec::new()
 		}
 	}));
-
-	// XXX: test data
-	{
-		let test_data = Rc::new(RefCell::new(character::Character {
-			body: 5,
-			agility: 2,
-			reaction: 6,
-			strength: 6,
-			will: 2,
-			logic: 2,
-			intuition: 3,
-			charisma: 2,
-			edge: 2,
-			magic_or_resonance: 0,
-			essence: 6.0,
-			physical_damage: 0,
-			stun_damage: 0,
-			initiative: 0,
-			matrix_initiative: 0,
-			astral_initiative: 0,
-			name: "Beefy Guard".to_string(),
-			metatype: character::Metatype::Troll,
-			archetype: character::Archetype::StreetSamurai
-		}));
-		gds.borrow_mut().active_characters.push(test_data);
-	}
 
 	let application =
 		gtk::Application::new(Some("com.blajzer.shadowpal"), Default::default())

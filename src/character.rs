@@ -2,6 +2,7 @@ extern crate serde;
 use serde::{Deserialize, Serialize};
 
 use std::str::FromStr;
+use std::convert::Into;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
 pub enum Metatype {
@@ -26,6 +27,18 @@ impl std::fmt::Display for Metatype {
     }
 }
 
+impl Into<i32> for Metatype {
+	fn into(self) -> i32 {
+		match self {
+			Metatype::Human => 0,
+			Metatype::Elf => 1,
+			Metatype::Dwarf => 2,
+			Metatype::Ork => 3,
+			Metatype::Troll => 4
+		}
+	}
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ParseMetatypeError { }
 
@@ -33,6 +46,7 @@ impl FromStr for Metatype {
     type Err = ParseMetatypeError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
+		print!("{}",s);
         match s.to_lowercase().as_str() {
 			"human" => Ok(Metatype::Human),
 			"elf" => Ok(Metatype::Elf),
@@ -71,6 +85,21 @@ impl std::fmt::Display for Archetype {
 			}
 		)
     }
+}
+
+impl Into<i32> for Archetype {
+	fn into(self) -> i32 {
+		match self {
+			Archetype::Adept => 0,
+			Archetype::Decker => 1,
+			Archetype::Face => 2,
+			Archetype::Mage => 3,
+			Archetype::Rigger => 4,
+			Archetype::Shaman => 5,
+			Archetype::StreetSamurai => 6,
+			Archetype::Technomancer => 7
+		}
+	}
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
