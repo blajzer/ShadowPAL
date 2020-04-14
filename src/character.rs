@@ -46,7 +46,6 @@ impl FromStr for Metatype {
     type Err = ParseMetatypeError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-		print!("{}",s);
         match s.to_lowercase().as_str() {
 			"human" => Ok(Metatype::Human),
 			"elf" => Ok(Metatype::Elf),
