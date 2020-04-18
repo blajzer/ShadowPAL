@@ -140,9 +140,12 @@ pub struct Character {
 	pub initiative: u8,
 	pub matrix_initiative: u8,
 	pub astral_initiative: u8,
+	pub armor: u8,
 	pub name: String,
 	pub metatype: Metatype,
-	pub archetype: Archetype
+	pub archetype: Archetype,
+	pub skills: String,
+	pub gear: String
 }
 
 impl Character {

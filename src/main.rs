@@ -1,5 +1,4 @@
-// TODO: re-enable for ship... is there a way to make this debug-only?
-//#![windows_subsystem = "windows"]
+#![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
 
 extern crate gtk;
 use gtk::prelude::*;
@@ -205,6 +204,16 @@ fn make_character_widget(char_data: Rc<RefCell<character::Character>>) -> gtk::B
 	let social_limit_text = format!("<b>Social: </b>{}", char_data_ref.social_limit());
 	social_limit.set_markup(social_limit_text.as_str());
 
+	let armor: gtk::Label = builder.get_object("Armor").expect("Couldn't get Armor");
+	let armor_text = format!("<b>Armor: </b>{}", char_data_ref.armor.to_string());
+	armor.set_markup(armor_text.as_str());
+
+	let skills: gtk::Label = builder.get_object("Skills").expect("Couldn't get Skills");
+	skills.set_markup(char_data_ref.skills.as_str());
+	
+	let gear: gtk::Label = builder.get_object("Gear").expect("Couldn't get Gear");
+	gear.set_markup(char_data_ref.gear.as_str());
+
 	// Initiative
 	// TODO: dedup
 	{
@@ -352,6 +361,16 @@ fn gtk_entry_to_num<T: std::str::FromStr>(entry: &gtk::Entry, default: T) -> T {
 	}
 }
 
+fn get_text_from_view(view: &gtk::TextView) -> String {
+	if let Some(buffer) = view.get_buffer() {
+		if let Some(text) = buffer.get_text(&buffer.get_start_iter(), &buffer.get_end_iter(), false) {
+			return text.to_string();
+		}
+	}
+
+	String::new()
+}
+
 fn make_character_from_template(
 	name: &gtk::Entry,
 	metatype: &gtk::ComboBoxText,
@@ -366,7 +385,10 @@ fn make_character_from_template(
 	charisma: &gtk::Entry,
 	edge: &gtk::Entry,
 	magic: &gtk::Entry,
-	essence: &gtk::Entry
+	essence: &gtk::Entry,
+	armor: &gtk::Entry,
+	skills: &gtk::TextView,
+	gear: &gtk::TextView
 ) -> character::Character {
 	let name_string = if let Some(name_text) = name.get_text() {
 		name_text.as_str().to_string()
@@ -386,6 +408,7 @@ fn make_character_from_template(
 		edge: gtk_entry_to_num(&edge, 0),
 		magic_or_resonance: gtk_entry_to_num(&magic, 0),
 		essence: gtk_entry_to_num(&essence, 6.0),
+		armor: gtk_entry_to_num(&armor, 0),
 		physical_damage: 0,
 		stun_damage: 0,
 		initiative: 0,
@@ -409,7 +432,9 @@ fn make_character_from_template(
 			}
 		} else {
 			character::Archetype::Adept
-		}
+		},
+		skills: get_text_from_view(skills),
+		gear: get_text_from_view(gear)
 	}
 }
 
@@ -537,6 +562,11 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 		let tmag: gtk::Entry = builder.get_object("TMAG").expect("Couldn't get TMAG");
 		let tess: gtk::Entry = builder.get_object("TESS").expect("Couldn't get TESS");
 
+		let template_armor: gtk::Entry = builder.get_object("TArmor").expect("Couldn't get TArmor");
+
+		let template_skills: gtk::TextView = builder.get_object("TSkills").expect("Couldn't get TSkills");
+		let template_gear: gtk::TextView = builder.get_object("TGear").expect("Couldn't get TGear");
+
 		// initialize the template list
 		rebuild_template_list(&template_list, &gds.borrow().template_characters);
 
@@ -556,6 +586,9 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 		let tedg_clone = tedg.clone();
 		let tmag_clone = tmag.clone();
 		let tess_clone = tess.clone();
+		let template_armor_clone = template_armor.clone();
+		let template_skills_clone = template_skills.clone();
+		let template_gear_clone = template_gear.clone();
 		template_list.connect_changed(move |list| {
 			// HACK: bail if this is being triggered programatically
 			if let Err(_) = gds_clone.try_borrow_mut() {
@@ -586,6 +619,16 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 						tedg_clone.set_text(template.edge.to_string().as_str());
 						tmag_clone.set_text(template.magic_or_resonance.to_string().as_str());
 						tess_clone.set_text(template.essence.to_string().as_str());
+						
+						template_armor_clone.set_text(template.armor.to_string().as_str());
+
+						if let Some(buffer) = template_skills_clone.get_buffer() {
+							buffer.set_text(template.skills.as_str());
+						}
+
+						if let Some(buffer) = template_gear_clone.get_buffer() {
+							buffer.set_text(template.gear.as_str());
+						}
 					}
 				}
 			}
@@ -624,6 +667,9 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 		let tedg_clone = tedg.clone();
 		let tmag_clone = tmag.clone();
 		let tess_clone = tess.clone();
+		let template_armor_clone = template_armor.clone();
+		let template_skills_clone = template_skills.clone();
+		let template_gear_clone = template_gear.clone();
 		let window_clone = window.clone();
 		template_save.connect_clicked(move |_| {
 			let mut mut_gds = gds_clone.borrow_mut();
@@ -642,7 +688,10 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 				&tcha_clone,
 				&tedg_clone,
 				&tmag_clone,
-				&tess_clone);
+				&tess_clone,
+				&template_armor_clone,
+				&template_skills_clone,
+				&template_gear_clone);
 
 			if let Some(pos) = mut_gds.template_characters.iter().position(|c| c.name == character.name) {
 				let dialog = gtk::Dialog::new_with_buttons(
@@ -684,6 +733,9 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 		let tedg_clone = tedg.clone();
 		let tmag_clone = tmag.clone();
 		let tess_clone = tess.clone();
+		let template_armor_clone = template_armor.clone();
+		let template_skills_clone = template_skills.clone();
+		let template_gear_clone = template_gear.clone();
 		template_instantiate.connect_clicked(move |_| {
 			let mut mut_gds = gds_clone.borrow_mut();
 
@@ -701,7 +753,10 @@ fn build_ui(application: &gtk::Application, gds: Rc<RefCell<DataStore>>) {
 				&tcha_clone,
 				&tedg_clone,
 				&tmag_clone,
-				&tess_clone)));
+				&tess_clone,
+				&template_armor_clone,
+				&template_skills_clone,
+				&template_gear_clone)));
 
 			mut_gds.active_characters.push(character.clone());
 			add_character_to_ui(&character, &gds_clone, &npc_list);
